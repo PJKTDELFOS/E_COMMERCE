@@ -1,0 +1,8 @@
+1 para se criar um choices, pode ser usar o Charfield
+passar os valores variaveis,
+
+2 outra forma mais simples de registrar: admin.site.register(classe do model)
+
+3 para lidar com imagens from PIL import Image
+
+4 filtros para redimensionamento de imagens Image.Resampling.LANCZOS(versao mais nova)
