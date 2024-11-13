@@ -6,3 +6,84 @@ passar os valores variaveis,
 3 para lidar com imagens from PIL import Image
 
 4 filtros para redimensionamento de imagens Image.Resampling.LANCZOS(versao mais nova)
+
+5-a palavra model em views e uma palavra especifica, entao quando precisar usar, e somente model
+pois se refere aos modelos, entao, e um model de cada vez, o mesmo se aplica as seguintes palavras
+queryset — para definir manualmente o conjunto de dados a ser exibido.
+template_name — para especificar o caminho do template que a view deve usar.
+context_object_name — para definir o nome do objeto de contexto que será passado ao template.
+template_name e outra para  procurar template
+
+
+1. Estrutura de Diretórios e Nomes de Pastas Reservados
+templatetags: Necessário para armazenar tags e filtros personalizados para templates.
+static: Pasta padrão para arquivos estáticos (CSS, JavaScript, imagens).
+templates: Pasta para armazenar templates HTML.
+migrations: Pasta para os arquivos de migração de banco de dados do Django.
+management/commands: Estrutura usada para adicionar comandos personalizados no Django (manage.py).
+locale: Pasta padrão para armazenar arquivos de tradução (i18n e l10n).
+fixtures: Usada para armazenar arquivos de dados de teste (fixtures).
+2. Arquivos Padrão do Django
+manage.py: Arquivo principal para executar comandos do Django, como runserver, migrate, makemigrations, etc.
+__init__.py: Necessário para indicar que uma pasta é um módulo Python.
+settings.py: Arquivo de configuração do Django, onde são definidas todas as configurações do projeto.
+urls.py: Arquivo padrão para configurar rotas de URL do projeto ou de um aplicativo.
+wsgi.py e asgi.py: Arquivos de configuração para o servidor WSGI/ASGI, usados para deploy em servidores.
+3. Nomes de Funções, Classes e Métodos
+No Django, algumas funções, classes e métodos possuem nomes reservados, principalmente no que diz respeito a modelos e views. Alguns dos mais comuns incluem:
+
+Métodos de Modelos:
+save(): Método chamado para salvar instâncias no banco de dados.
+delete(): Método para deletar uma instância.
+get_absolute_url(): Método usado para retornar a URL de um objeto.
+clean(): Método para validação de objetos.
+Métodos de Formulários:
+clean_fieldname(): Para validação de campos específicos em formulários (ex: clean_email()).
+is_valid(): Valida o formulário.
+save(): Salva uma instância do formulário.
+Métodos de Admin:
+has_add_permission, has_change_permission, has_delete_permission: Métodos usados para definir permissões de usuários no Django Admin.
+4. Nomes Reservados para Configuração e Atributos
+INSTALLED_APPS: Lista de aplicativos instalados.
+MIDDLEWARE: Lista de middleware para processamento de solicitações/respostas.
+DATABASES: Configuração de banco de dados.
+AUTH_USER_MODEL: Define o modelo personalizado de usuário.
+TEMPLATES: Configuração de templates do Django.
+STATIC_URL, STATIC_ROOT: Configuração de arquivos estáticos.
+MEDIA_URL, MEDIA_ROOT: Configuração de arquivos de mídia.
+5. Views e Templates
+Nos templates, alguns nomes são reservados para tags padrão do Django:
+{% load %}: Para carregar bibliotecas de tags.
+{% url %}: Para referenciar URLs.
+{% static %}: Para referenciar arquivos estáticos.
+{% block %}, {% endblock %}, {% extends %}, {% include %}: Para estruturação e reutilização de templates.
+6. Palavras-Chave de Consulta em Django ORM
+Ao realizar consultas no ORM, alguns nomes são reservados para operações:
+
+objects: Manager padrão para modelos.
+Métodos de consultas como filter, exclude, get, all, order_by, distinct, values, annotate, etc.
+7. Sinais do Django
+Nomes de sinais que o Django utiliza internamente e que podem ser conectados a eventos específicos:
+
+post_save, pre_save: Disparados antes e depois de salvar uma instância.
+post_delete, pre_delete: Disparados antes e depois de deletar uma instância.
+request_finished, request_started: Disparados no início e no final de uma requisição.
+8. Comandos do Manage.py
+Comandos padrões do manage.py (alguns exemplos):
+
+runserver, migrate, makemigrations, startapp, startproject, createsuperuser, collectstatic, entre outros.
+
+para obter os ids dos produtos sem variação, pela url , nao use so vid, de outros nomes
+
+
+      <option
+      data-preco="{{produto.preco_marketing|formata_preco}} "
+      data-preco-promocional="{{produto.preco_marketing_promocional|formata_preco}} "
+      value="{{produto.id}}">
+
+      {{produto.nome}}
+
+       </option>
+
+ PARA ESSE MODELO, MESMO PRODUTOS SEM VARIAÇÃOV AO TER VARIAÇOES, CABE  MANEIRA DE CADASTRAR, VER MANEIRAS E
+ PRECESSOS DISTINTOS PARA EXECUTAR A TAREFA
