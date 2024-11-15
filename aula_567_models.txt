@@ -87,3 +87,18 @@ para obter os ids dos produtos sem variação, pela url , nao use so vid, de out
 
  PARA ESSE MODELO, MESMO PRODUTOS SEM VARIAÇÃOV AO TER VARIAÇOES, CABE  MANEIRA DE CADASTRAR, VER MANEIRAS E
  PRECESSOS DISTINTOS PARA EXECUTAR A TAREFA
+
+
+ ver depois
+  # produto_id = self.request.GET.get('pid')
+        # if  produto_id:
+        #     produto = get_object_or_404(Produto, id=produto_id)
+        #     return HttpResponse(f' {produto.nome}')
+
+o programa deve capturar cada variação id , somr os totais e retornar o total final
+
+junto ao load static {% get_media_prefix %} aplica arquivos de imagens e entre outros
+para no carrinho fazer referencia a voltar ai produto, devo  ir na view do detalhe .para capturar o slug, usando o name
+space
+
+ver a questao da atualização do preço unitario vindo da tabela

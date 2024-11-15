@@ -5,6 +5,7 @@ from django.shortcuts import render,redirect,reverse,get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
 from .models import Produto,Variacao
+from pprint import pprint
 
 
 # Create your views here.
@@ -25,46 +26,92 @@ class DetalharProdutos(DetailView):
 
 
 
+
 class addcarrinho(View):
 
     def get(self, *args, **kwargs):
+        #TODO REMOVER ABAIXO
+        # if self.request.session.get('cart'):
+        #     del self.request.session.get['cart']
+        #     self.request.session.save()
+
         http_referer=self.request.META.get(
             'HTTP_REFERER',
             reverse('produto:lista')
         )
-        # produto_id = self.request.GET.get('pid')
-        # if  produto_id:
-        #     produto = get_object_or_404(Produto, id=produto_id)
-        #     return HttpResponse(f' {produto.nome}')
+
         variacao_id = self.request.GET.get('vid')
+
         if not variacao_id:
             messages.error(self.request, 'Produto nao existe')
             return redirect(http_referer)
         variacao = get_object_or_404(Variacao, id=variacao_id)
-        if not self.request.session.get('carrinho'):
-            self.request.session['carrinho']={}
+        variacao_estoque=variacao.estoque
+        produto=variacao.produto
+        produto_id = produto.id
+        produto_nome = produto.nome
+        variacao_nome = variacao.nome or ''
+        preco_unitario = variacao.preco
+        preco_unitario_promocional = variacao.preco_promocional
+        quantidade = 1
+        slug = produto.slug
+        imagem = produto.imagem
+        if imagem:
+            imagem=imagem.name
+        else:
+            imagem=''
+        #1-checar estoque
+        if variacao.estoque<1:
+            messages.error(
+                self.request,
+                'Produto indisponivel'
+            )
+            return redirect(http_referer)
+
+        if not self.request.session.get('cart'):
+            self.request.session['cart']={} #criação do dict
             self.request.session.save()
 
-        cart=self.request.session['carrinho']
+        cart=self.request.session['cart']
 
         if variacao_id in cart:
-            #TODO:Variação existe no carrinho
-            pass
-        else:
-            #TODO:Variação não existe no carrinho
-            pass
+            quantidade_carrinho=cart[variacao_id]['quantidade']# a quantidade elançada dentro do dict aumentar em 1
+            # a cada interação
+            quantidade_carrinho+=1
+            if variacao_estoque <quantidade_carrinho:# 3 verificar se estoque cobre a comprar
+                messages.warning(self.request,
+                f'Estoque insuficiente para {quantidade_carrinho} unidades do'
+                f'{produto_nome}, adicionamos {variacao_estoque} no seu carrinho')
+                quantidade_carrinho=variacao_estoque
+            cart[variacao_id]['quantidade']=quantidade_carrinho
+            cart[variacao_id]['preco_quantitativo'] = (preco_unitario *
+                                                       quantidade_carrinho)
+            cart[variacao_id]['preco_quantitativo_promocional'] = (preco_unitario_promocional *
+                                                       quantidade_carrinho)
 
 
-        return HttpResponse(f'{variacao.produto} {variacao.nome}')
 
+        else:#passo 2, lançar as informaçoes que vao no carrinho
+           cart[variacao_id]={
+            'produto_id' :produto_id ,
+            'produto_nome' :produto_nome ,
+            'variacao_nome':variacao_nome ,
+            'variacao_id'  :variacao_id  ,
+            'preco_unitario' :preco_unitario ,
+            'preco_unitario_promocional' :preco_unitario_promocional ,
+            'preco_quantitativo':preco_unitario,
+            'preco_quantitativo_promocional' :preco_unitario_promocional ,
+            'quantidade':quantidade ,
+            'slug' :slug ,
+            'imagem':imagem,
+           }
 
+        self.request.session.save()
+        pprint(cart)
+        messages.success(self.request, f'voce tem no seu '
+                                       f'carrinho{cart[variacao_id]['quantidade']}')
 
-
-
-
-
-
-
+        return redirect(http_referer)
 
 
 
@@ -73,8 +120,13 @@ class removercarrinho(View):
         return HttpResponse('removercarrinho')
 
 class carrinho(View):
+
+
     def get(self, *args, **kwargs):
-        return HttpResponse('carrinho')
+        context = {
+            'carrinho': self.request.session.get('cart',{})
+        }
+        return render(self.request,'produto/carrinho.html',context)# pagina da web onde sera renderizado
 
 class finalizarcompra(View):
     def get(self, *args, **kwargs):
