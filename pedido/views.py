@@ -12,7 +12,7 @@ class pagar(View):
         return HttpResponse('pagar')
 
 
-class fecharpedido(View):
+class Fecharpedido(View):
     def get(self, *args, **kwargs):
         return HttpResponse('fecharpedido')
 

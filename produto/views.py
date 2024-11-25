@@ -1,3 +1,5 @@
+from idlelib.mainmenu import menudefs
+
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views import View
@@ -116,8 +118,26 @@ class addcarrinho(View):
 
 
 class removercarrinho(View):
+
     def get(self, *args, **kwargs):
-        return HttpResponse('removercarrinho')
+        http_referer=self.request.META.get(
+            'HTTP_REFERER',
+        reverse('produto:lista'))
+        variacao_id = self.request.GET.get('vid')
+        if not variacao_id:
+            return redirect(http_referer)
+        if not self.request.session.get('cart'):
+            return redirect(http_referer)
+        if not variacao_id in self.request.session['cart']:
+            return redirect(http_referer)
+        cart=self.request.session['cart'][variacao_id]
+        messages.success(self.request,f''
+                                      f'Produto {cart['produto_nome']}  {cart['variacao_nome']}'
+                                      f'   removido do seu carrinho')
+
+        del self.request.session['cart'][variacao_id]
+        self.request.session.save()
+        return redirect(http_referer)
 
 class carrinho(View):
 
@@ -128,7 +148,20 @@ class carrinho(View):
         }
         return render(self.request,'produto/carrinho.html',context)# pagina da web onde sera renderizado
 
-class finalizarcompra(View):
+
+
+
+
+class ResumoDacompra(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('finalizarcompra')
+        if not self.request.user.is_authenticated:
+            return redirect('perfil:criar')
+
+
+        contexto={
+            'usuario': self.request.user,
+            'carrinho': self.request.session['cart']
+
+        }
+        return render(self.request,'produto/resumodacompra.html',contexto)
 

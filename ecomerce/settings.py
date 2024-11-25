@@ -42,7 +42,11 @@ INSTALLED_APPS = [
     'perfil',
     # TODO: Remover deubg toolbar
     'debug_toolbar',
+    'crispy_forms',
+    'crispy_bootstrap4',
 ]
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

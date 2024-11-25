@@ -1,26 +1,154 @@
 from django.views.generic.list import ListView
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404,redirect
 from django.http import HttpResponse
+from . import models, forms
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+import copy
+from django.contrib import messages
 
 
 # Create your views here.
 
+class BasePerfil(View):
+    template_name = 'perfil/criar.html'
 
-class criar(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('criar')
+    def setup(self,*args,**kwargs):
+        super().setup(*args,**kwargs)
 
-class update(View):
+        self.carrinho=copy.deepcopy(self.request.session.get('cart',{}))
+
+        self.perfil=None
+
+        if self.request.user.is_authenticated:
+            self.perfil=(models.PerfilUsuario.objects.filter
+                             (
+                usuario=self.request.user).first())
+
+            self.contexto={
+                'userform':forms.UserForm(
+                    data=self.request.POST or None,
+                    usuario=self.request.user,
+                    instance=self.request.user,),
+
+                'perfilform': forms.Perfilform(
+                    data=self.request.POST or None,
+                    instance=self.perfil)
+
+            }
+        else:
+            self.contexto = {
+                'userform': forms.UserForm(data=self.request.POST or None),
+                'perfilform': forms.Perfilform(data=self.request.POST or None),
+
+            }
+        self.userform=self.contexto['userform']
+        self.perfilform=self.contexto['perfilform']
+
+        if self.request.user.is_authenticated:
+            self.template_name='perfil/atualizar.html'
+
+        self.renderizar=render(
+            self.request,self.template_name,self.contexto)
+
+    def get(self,*args,**kwargs):
+        return self.renderizar
+
+class Criar(BasePerfil):
+    def post(self,*args,**kwargs):
+        if not self.userform.is_valid() or not self.perfilform.is_valid():
+            return self.renderizar
+        username=self.userform.cleaned_data.get('username')
+        password=self.userform.cleaned_data.get('password')
+        email=self.userform.cleaned_data.get('email')
+        first_name=self.userform.cleaned_data.get('first_name')
+        last_name=self.userform.cleaned_data.get('last_name')
+
+        if self.request.user.is_authenticated:
+           usuario=get_object_or_404(
+               User,username=self.request.user.username,
+           )
+           usuario.username=username
+           if password:
+               usuario.set_password(password)
+           usuario.email=email
+           usuario.first_name=first_name
+           usuario.last_name=last_name
+           usuario.save()
+
+           if not self.perfil:
+               self.perfilform.cleaned_data['usuario']=usuario
+               perfil=models.PerfilUsuario(**self.perfilform.cleaned_data)
+               perfil.save()
+           else:
+               perfil=self.perfilform.save(commit=False)
+               perfil.usuario=usuario
+               perfil.save()
+
+
+        else:
+
+            usuario=self.userform.save(commit=False)
+            usuario.set_password(password)
+            usuario.save()
+
+            perfil = self.perfilform.save(commit=False)
+            perfil.usuario=usuario
+            perfil.save()
+
+        if password:
+            autentica=authenticate(self.request,
+                                   username=usuario,
+                                   password=password,)
+            if autentica:
+                login(self.request,user=usuario)
+        self.request.session['carrinho'] = self.carrinho
+        self.request.session.save()
+        messages.success(self.request,'Seu cadastro foi atualizado')
+        messages.success(self.request,'Sua compra foi feita ')
+        return redirect('perfil:criar.html')
+        return self.renderizar
+
+
+class Update(View):
     def get(self, *args, **kwargs):
         return HttpResponse('atualizar')
 
-
-class login(View):
+class Delete(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('login')
+        return HttpResponse('apagar')
 
-class logout(View):
+
+class Login(View):
+    def post(self, *args, **kwargs):
+        username=self.request.POST.get('username')
+        password=self.request.POST.get('password')
+
+        if not username and not password:
+            messages.error(self.request,'usuario ou senha invalido')
+            return redirect('perfil:criar')
+
+
+        usuario=authenticate(self.request,
+            username=username, password=password)
+
+        if not usuario:
+            messages.error(self.request, 'Login falhou, tente de novo')
+            return redirect('perfil:criar')
+
+
+        login(self.request,user=usuario)
+        messages.success(self.request,'Logado com sucesso')
+        return redirect('produto:carrinho')
+
+
+
+class Logout(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('logout')
+        carrinho=copy.deepcopy(self.request.session.get('cart',{}))
+        logout(self.request)
+        self.request.session['cart']=carrinho
+        self.request.session.save()
+        return redirect('perfil:criar')
 

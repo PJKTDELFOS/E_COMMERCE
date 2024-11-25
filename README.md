@@ -73,3 +73,10 @@ e a chame aonde precisar, como um informativo de  quantidade de produtos no carr
 #contador = 0
 #addcarrinho.contador+=1
 #mensagem = f'compra adicionada {addcarrinho.contador}'
+
+troca de senha do super user ou de users
+
+python manage.py changepassword usuario
+senha:
+
+sempre que precisar lidar, metodo post def post(nao e um nome generico, e uma palavra reservada)

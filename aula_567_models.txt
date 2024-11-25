@@ -102,3 +102,40 @@ para no carrinho fazer referencia a voltar ai produto, devo  ir na view do detal
 space
 
 ver a questao da atualização do preço unitario vindo da tabela
+
+
+estudar esse list compreeensions
+ return sum(
+        item.get('preco_quantitativo_promocional')
+        if item.get('preco_quantitativo_promocional')
+        else item.get('preco_quantitativo')
+        for item in cart.values()
+    )
+
+
+return sum(
+        item.get('preco_quantitativo_promocional')
+        if item.get('preco_quantitativo_promocional')
+        else item.get('preco_quantitativo')
+        for item in cart.values()
+    )
+
+quando  usar super., nao usaro  self no chamar do metodo apos o super
+ super().setup(*args,**kwargs)# quando usar desse jeito, nao pode por o self
+
+ 
+ A partir do django-crispy-forms 2.0, os pacotes de modelos agora estão em pacotes separados.
+
+É necessário instalar o modelo desejado e adicioná-lo em INSTALLED_APPS
+
+pip install crispy-bootstrap4
+
+INSTALLED_APPS = [
+    ...
+    'crispy_forms',
+    'crispy_bootstrap4',
+    ...
+]
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
